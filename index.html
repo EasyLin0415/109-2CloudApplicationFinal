@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://1310831020easyweb.azurewebsites.net/ -->
+<html class="translated-ltr" style="
+    background-image: url( &#39; https://static.popdaily.com.tw/u/202102/66d72b9a-cad1-43b2-ac07-8ae91f220aa1.jpg&#39; );
+"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>名字好難取</title>
+    <script src="./&#27320;&#27308;&#25110;&#37240;&#27225;_files/jquery.min.js.&#19979;&#36617;"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>      
+<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="/js/flot/excanvas.min.js"></script><![endif]-->   
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<link type="text/css" rel="stylesheet" charset="UTF-8" href="./&#27320;&#27308;&#25110;&#37240;&#27225;_files/translateelement.css"></head>
+<body style="zoom: 1;">
+<script type="text/javascript">
+    function processImage() {
+        // **********************************************
+        // *** Update or verify the following values. ***
+        // **********************************************
+
+        let subscriptionKey = 'e33faf921fe24f0b8903dec334bb025f';
+        let endpoint = 'https://southcentralus.api.cognitive.microsoft.com/customvision/v3.0/Prediction/edeabe27-e0a3-4170-8cce-23f6976749f5/classify/iterations/Iteration4/url';
+        if (!subscriptionKey) { throw new Error('Set your environment variables for your subscription key and endpoint.'); }
+        
+        // Display the image.
+        var sourceImageUrl = document.getElementById("inputImage").value;
+        document.querySelector("#sourceImage").src = sourceImageUrl;
+
+        // Make the REST API call.
+        $.ajax({
+            url: endpoint + "?",
+
+            // Request headers.
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Prediction-Key", subscriptionKey);
+            },
+
+            type: "POST",
+
+            // Request body.
+            data: '{"url": ' + '"' + sourceImageUrl + '"}',
+        })
+
+        .done(function(data) {
+            // Show formatted JSON on webpage.
+            $("#responseTextArea").val(JSON.stringify(data, null, 2));
+    var barData = {
+			        labels: [data.predictions[0].tagName, data.predictions[1].tagName, data.predictions[2].tagName, data.predictions[3].tagName, data.predictions[4].tagName],
+			         datasets: [
+				        {
+				            label: "預測結果百分比",
+				            backgroundColor: "rgba(58,203,254,1)",
+				            strokeColor: "rgba(220,220,220,0.8)",
+				            highlightFill: "rgba(220,220,220,0.75)",
+				            highlightStroke: "rgba(220,220,220,1)",
+				            data: [data.predictions[0].probability*100, data.predictions[1].probability*100,data.predictions[2].probability*100, data.predictions[3].probability*100, data.predictions[4].probability*100]
+				        }
+
+				    ]
+			    };
+
+			    // render chart
+			    var ctx = document.getElementById("barChart");
+				var myRadarChart = new Chart(ctx, {
+					type: 'bar',
+					data: barData,
+					options:{
+						responsive: false,
+						
+					}
+				});
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " :
+                errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" :
+                jQuery.parseJSON(jqXHR.responseText).message;
+            alert(errorString);
+        });
+
+    };
+</script>
+
+
+<h1 style="
+    margin: 0;
+    padding: 20px 0;
+    color: #00539F;
+    text-shadow: 3px 3px 6px #ff8282;
+"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">分析圖像</font></font></h1>
+<font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+輸入圖像的 URL，然後</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">開始分析</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">按鈕。(分析需要數秒,請耐心等待)
+</font></font><br><br><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+要分析的圖像： 
+</font></font><input type="text" name="inputImage" id="inputImage" value="https://cdn.hk01.com/di/media/images/2889837/org/4ef07fed4a8836f3ed6df68bbfc7d0c9.jpg/nAAal3F-2QSZICGJCFefX31f_bD3NTZhM-WgQjPloEI?v=w1920">
+<button onclick="processImage()"><font style="vertical-align: inherit;"><font style="">開始分析</font></font></button>
+<br><br>
+<div id="wrapper" style="width:1020px; display:table;">
+    <div id="jsonOutput" style="width:600px; display:table-cell;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+        結果回應:
+        </font></font><br><br>
+        <canvas id="barChart" width="400" height="400"></canvas>
+    </div>
+    <div id="imageDiv" style="width:420px; display:table-cell;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+        來源圖像:
+        </font></font><br><br>
+        <img id="sourceImage" width="400" src="https://cdn.hk01.com/di/media/images/2889837/org/4ef07fed4a8836f3ed6df68bbfc7d0c9.jpg/nAAal3F-2QSZICGJCFefX31f_bD3NTZhM-WgQjPloEI?v=w1920">
+    </div>
+</div>
+</body>
+</html>
